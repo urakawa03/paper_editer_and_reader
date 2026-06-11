@@ -1,0 +1,366 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body {
+  font-family: var(--font-ui);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: var(--font-ui);
+}
+
+input,
+textarea,
+select {
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+::placeholder {
+  color: var(--placeholder);
+}
+
+a {
+  color: var(--accent);
+}
+
+/* ---- 起動スプラッシュ ---- */
+.splash {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 34px;
+  letter-spacing: -0.02em;
+}
+.splash .dot {
+  color: var(--accent);
+}
+
+/* ---- ロゴ ---- */
+.logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  line-height: 1;
+  white-space: nowrap;
+}
+.logo .dot {
+  color: var(--accent);
+}
+
+/* ---- AND/OR セグメント ---- */
+.seg {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+.seg button {
+  border: none;
+  background: var(--paper);
+  padding: 8px 12px;
+  font-size: 12.5px;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+.seg button.on {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ---- 同期インジケータ(PC-8) ---- */
+.sync-ind {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.sync-ind:hover {
+  background: var(--hover);
+}
+.sync-ind .pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ok);
+  flex: 0 0 auto;
+}
+.sync-ind.saving .pulse {
+  background: var(--accent);
+  animation: blink 1s ease infinite;
+}
+.sync-ind.pending .pulse {
+  background: var(--reading);
+}
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* ---- ヘッダー右側のアクション群 ---- */
+.hdr-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.icon-btn {
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+  color: var(--ink-soft);
+  border-radius: 9px;
+  padding: 7px 11px;
+  font-size: 12.5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.icon-btn:hover {
+  background: var(--hover);
+}
+.icon-btn.primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+/* ---- モーダル ---- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(29, 26, 23, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 18px;
+}
+.modal-panel {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+  padding: 24px 26px;
+  box-shadow: var(--shadow-card);
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 21px;
+  margin: 0 0 16px;
+}
+.modal-close-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+  gap: 8px;
+}
+
+/* ---- フォーム ---- */
+.field {
+  margin-bottom: 14px;
+}
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+  font-size: 14px;
+  outline: none;
+}
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--accent);
+}
+.field .hint {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+.note-box {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  background: var(--accent-soft);
+  border-radius: 10px;
+  padding: 10px 13px;
+  line-height: 1.6;
+  margin: 14px 0;
+}
+[data-theme='dark'] .note-box {
+  color: var(--ink-body);
+}
+
+/* ---- 設定画面 ---- */
+.settings-root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 40px 18px;
+}
+.settings-card {
+  width: 100%;
+  max-width: 520px;
+}
+.settings-card .logo {
+  font-size: 30px;
+  margin-bottom: 4px;
+  display: inline-block;
+}
+.settings-sub {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 0 0 26px;
+}
+.settings-row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.settings-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.btn {
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.btn:hover {
+  background: var(--hover);
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fffdf8;
+  font-weight: 600;
+}
+.btn.danger {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.check-result {
+  font-size: 13px;
+  margin-top: 10px;
+}
+.check-result.ok {
+  color: var(--ok);
+}
+.check-result.ng {
+  color: var(--accent);
+}
+
+/* ---- 取り込みモーダル ---- */
+.dropzone {
+  border: 2px dashed var(--line);
+  border-radius: 14px;
+  padding: 22px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 13px;
+  cursor: pointer;
+  background: var(--paper-2);
+}
+.dropzone.over {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.dropzone .files {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ink);
+}
+.ingest-progress {
+  margin: 14px 0;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+.ingest-bar {
+  height: 6px;
+  background: var(--hover);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.ingest-bar > div {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.2s;
+}
+.result-list {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+.result-list .ok {
+  color: var(--ok);
+}
+.result-list .skip {
+  color: var(--reading);
+}
+.result-list .fail {
+  color: var(--accent);
+}
+
+/* ---- 空状態 ---- */
+.empty-state {
+  text-align: center;
+  color: var(--ink-soft);
+  padding: 70px 20px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.8;
+}
