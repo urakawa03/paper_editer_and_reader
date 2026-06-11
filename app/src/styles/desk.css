@@ -330,6 +330,42 @@
   outline: none;
   width: 130px;
 }
+.ed-addtag-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.ed-suggest {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  min-width: 170px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  box-shadow: 0 6px 22px rgba(29, 26, 23, 0.14);
+  padding: 4px;
+}
+.ed-suggest button {
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 12px;
+  padding: 6px 9px;
+  border-radius: 6px;
+  color: var(--ink-body);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ed-suggest button:hover,
+.ed-suggest button.active {
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
 
 .ed-section-label {
   font-size: 12px;
