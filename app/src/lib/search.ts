@@ -1,13 +1,19 @@
 import type { Filter, Paper } from '../types';
 
 function haystack(p: Paper): string {
-  return `${p.title} ${p.authors.join(' ')} ${p.tags.join(' ')} ${p.abstract}`.toLowerCase();
+  return `${p.title} ${p.authors.join(' ')} ${p.tags.join(' ')} ${p.abstract} ${p.notes}`.toLowerCase();
 }
 
-/** AND/OR検索(§PC-3: title/authors/tags/Abstract対象) + タグ絞り込み(複数=AND) + ソート */
+/**
+ * AND/OR検索(§PC-3: title/authors/tags/Abstract/Notes対象) + タグ絞り込み(複数=AND)
+ * + いいね/既読フィルタ + ソート
+ */
 export function filterPapers<T extends Paper>(papers: T[], f: Filter): T[] {
   const terms = f.query.trim().toLowerCase().split(/\s+/).filter(Boolean);
   let list = papers.filter((p) => {
+    if (f.liked && !p.liked) return false;
+    if (f.read === 'read' && p.status !== 'read') return false;
+    if (f.read === 'unread' && p.status === 'read') return false;
     if (!f.tags.every((t) => p.tags.includes(t))) return false;
     if (terms.length === 0) return true;
     const hay = haystack(p);

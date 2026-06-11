@@ -74,6 +74,7 @@ const mk = (id: string, over: Partial<StoredPaper> = {}): StoredPaper => ({
   abstract: 'abc',
   notes: '',
   sha: null,
+  base: null,
   ...over,
 });
 
@@ -186,6 +187,25 @@ describe('flushPush', () => {
     expect(parsePaperMarkdown(hub.files.get('papers/a.md')!.text).liked).toBe(true);
     expect(await dbGetQueue()).toHaveLength(0);
   });
+
+  it('リモートが進んでいたら取り込んでマージしてからpushする(他端末の変更を上書きしない)', async () => {
+    hub.seed('papers/a.md', serializePaperMarkdown(mk('a')));
+    await seedLocalFromRemote();
+
+    // 他端末が先にメモをpush(HEADが進む) → ローカルはpullしないまま「いいね」をpush
+    hub.seed(
+      'papers/a.md',
+      serializePaperMarkdown(mk('a', { notes: '他端末のメモ', updated_at: '2026-02-01T00:00:00Z' })),
+    );
+    await mutatePaper('a', { liked: true });
+    await flushPush();
+
+    const remote = parsePaperMarkdown(hub.files.get('papers/a.md')!.text);
+    expect(remote.liked).toBe(true);
+    expect(remote.notes).toBe('他端末のメモ'); // 旧実装ではここが空に巻き戻っていた
+    expect(await dbGetQueue()).toHaveLength(0);
+    expect(useAppStore.getState().papers['a'].notes).toBe('他端末のメモ');
+  });
 });
 
 describe('pull', () => {
@@ -220,6 +240,29 @@ describe('pull', () => {
     const papers = useAppStore.getState().papers;
     expect(papers['a']).toBeUndefined();
     expect(papers['b']).toBeDefined(); // dirtyなので残る
+  });
+
+  it('別端末のフィールド変更とローカルのメモ編集が両立する(3-wayマージ §5.E改)', async () => {
+    hub.seed('papers/a.md', serializePaperMarkdown(mk('a')));
+    await pull();
+    await mutatePaper('a', { notes: '自分のメモ' });
+    // 他端末: いいね+既読を、ローカル編集より新しいupdated_atでpush済み
+    hub.seed(
+      'papers/a.md',
+      serializePaperMarkdown(mk('a', { liked: true, status: 'read', updated_at: '2099-01-01T00:00:00Z' })),
+    );
+    await pull();
+
+    const a = useAppStore.getState().papers['a'];
+    expect(a.notes).toBe('自分のメモ'); // 全体LWWだとここが巻き戻る
+    expect(a.liked).toBe(true);
+    expect(a.status).toBe('read');
+    expect((await dbGetQueue()).map((q) => q.id)).toContain('a'); // マージ結果は後でpushされる
+
+    await flushPush();
+    const remote = parsePaperMarkdown(hub.files.get('papers/a.md')!.text);
+    expect(remote.notes).toBe('自分のメモ');
+    expect(remote.liked).toBe(true);
   });
 
   it('dirty論文のリモート変更はupdated_atで新しい方が勝つ(LWW)', async () => {

@@ -85,6 +85,27 @@ a {
   color: var(--paper);
 }
 
+/* ---- いいね絞り込みチップ(両ビュー共用) ---- */
+.chip-like {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: all 0.15s;
+}
+.chip-like.on {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent-deep);
+}
+
 /* ---- 同期インジケータ(PC-8) ---- */
 .sync-ind {
   display: flex;

@@ -18,9 +18,14 @@ export interface Paper {
   notes: string;
 }
 
-/** IndexedDBに置く形。sha = 最後に確認したリモートblobのsha(差分pull判定用) */
+/**
+ * IndexedDBに置く形。
+ * sha = 最後に確認したリモートblobのsha(差分pull判定用)。
+ * base = リモートと最後に合意した内容(3-wayマージの共通祖先)。null = 未同期(全体LWWにフォールバック)。
+ */
 export interface StoredPaper extends Paper {
   sha: string | null;
+  base: Paper | null;
 }
 
 export interface QueueEntry {
@@ -71,13 +76,26 @@ export type SyncStatusKind = 'synced' | 'saving' | 'pending';
 
 export type SortKey = 'added' | 'updated' | 'year' | 'title';
 
+/** 既読フィルタ: unread = status≠read(読書中含む), read = status=read */
+export type ReadFilter = 'all' | 'unread' | 'read';
+
 export interface Filter {
   query: string;
   mode: 'AND' | 'OR';
   tags: string[];
+  liked: boolean;
+  read: ReadFilter;
   sort: SortKey;
   dir: 'asc' | 'desc';
 }
 
 export const DEFAULT_UI: UiSettings = { viewOverride: 'auto', theme: 'auto' };
-export const DEFAULT_FILTER: Filter = { query: '', mode: 'AND', tags: [], sort: 'added', dir: 'desc' };
+export const DEFAULT_FILTER: Filter = {
+  query: '',
+  mode: 'AND',
+  tags: [],
+  liked: false,
+  read: 'all',
+  sort: 'added',
+  dir: 'desc',
+};

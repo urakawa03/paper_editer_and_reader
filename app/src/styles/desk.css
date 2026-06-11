@@ -73,6 +73,25 @@
   color: var(--paper);
   border-color: var(--ink);
 }
+.desk-tag.more {
+  border-style: dashed;
+  color: var(--accent-deep);
+}
+.desk-filterbar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  align-items: center;
+}
+.desk-filterbar .seg button {
+  padding: 4px 10px;
+  font-size: 11.5px;
+}
+.desk-filterbar .chip-like {
+  padding: 4px 10px;
+  font-size: 11.5px;
+}
 .desk-sort {
   margin-left: auto;
   font-size: 11.5px;

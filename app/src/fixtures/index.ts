@@ -14,7 +14,7 @@ export function fixturesEnabled(): boolean {
 export function loadFixtures(): void {
   const papers: StoredPaper[] = Object.entries(raw).map(([path, text]) => {
     const id = path.split('/').pop()!.replace(/\.md$/, '');
-    return { ...parsePaperMarkdown(text, id), sha: 'fixture' };
+    return { ...parsePaperMarkdown(text, id), sha: 'fixture', base: null };
   });
   useAppStore.getState().setPapers(papers);
 }
