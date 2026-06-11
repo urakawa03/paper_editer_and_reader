@@ -85,6 +85,11 @@ export function FeedDetail({ paper }: { paper: StoredPaper }) {
                 setNotes(e.target.value);
                 commit.call();
               }}
+              onFocus={(e) => {
+                // ソフトキーボード表示後に入力欄を見える位置へ戻す
+                const el = e.currentTarget;
+                setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+              }}
               onBlur={commit.flush}
             />
           </div>

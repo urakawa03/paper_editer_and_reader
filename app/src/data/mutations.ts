@@ -10,17 +10,22 @@ export async function mutatePaper(id: string, patch: Partial<Paper>): Promise<vo
   const st = useAppStore.getState();
   const cur = st.papers[id];
   if (!cur) return;
-  const next: StoredPaper = { ...cur, ...patch, id, updated_at: new Date().toISOString() };
+  // 端末間の時計ズレがあっても「自分の最新編集が自分の過去に負ける」ことはないよう単調増加にする
+  const prevMs = Date.parse(cur.updated_at);
+  const ts = new Date(
+    Number.isFinite(prevMs) ? Math.max(Date.now(), prevMs + 1) : Date.now(),
+  ).toISOString();
+  const next: StoredPaper = { ...cur, ...patch, id, updated_at: ts };
   st.upsertPapers([next]);
   await dbPutPapers([next]);
   await dbEnqueue(id, 'upsert');
   schedulePush();
 }
 
-/** 取り込みパイプラインからの新規追加。リモート未pushなので sha: null */
+/** 取り込みパイプラインからの新規追加。リモート未pushなので sha: null, base: null */
 export async function addPapers(papers: Paper[]): Promise<void> {
   if (papers.length === 0) return;
-  const stored: StoredPaper[] = papers.map((p) => ({ ...p, sha: null }));
+  const stored: StoredPaper[] = papers.map((p) => ({ ...p, sha: null, base: null }));
   useAppStore.getState().upsertPapers(stored);
   await dbPutPapers(stored);
   for (const p of stored) await dbEnqueue(p.id, 'upsert');

@@ -3,6 +3,7 @@ import '../../styles/feed.css';
 import { useAppStore } from '../../data/store';
 import { collectTags, filterPapers } from '../../lib/search';
 import { ModeSeg, SearchBar } from '../../components/SearchBar';
+import { FilterChips } from '../../components/FilterChips';
 import { HeaderActions } from '../../components/HeaderActions';
 import { FeedCard } from './FeedCard';
 import { FeedDetail } from './FeedDetail';
@@ -40,12 +41,12 @@ export function FeedView() {
             <span className="logo">
               Stacks<span className="dot">.</span>
             </span>
-            <span className="pf-tagline">隙間時間で、ぐんぐん読む</span>
-            <HeaderActions compact />
+            <HeaderActions compact showAdd={false} />
           </div>
           <SearchBar className="pf-search" placeholder="検索（例: 物理 シミュレーション）" />
           <div className="pf-controls">
             <ModeSeg />
+            <FilterChips />
             <select
               value={SORT_OPTIONS.some((o) => o.value === sortValue) ? sortValue : 'added:desc'}
               onChange={(e) => {
@@ -76,13 +77,13 @@ export function FeedView() {
                 <>
                   まだ論文がありません。
                   <br />
-                  右上の「＋」から追加してみて。
+                  論文の追加はPC表示から行えます。
                 </>
               ) : (
                 <>
                   該当する論文がありません。
                   <br />
-                  タグや検索を見直してみて。
+                  タグ・検索・フィルターを見直してみて。
                 </>
               )}
             </div>

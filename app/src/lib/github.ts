@@ -111,13 +111,16 @@ export class GitHubClient {
 
   /**
    * 複数ファイルの作成・更新・削除を1コミットでpushする。
-   * refの更新がnon-fast-forwardで失敗した場合は kind:'conflict' を投げる(呼び出し側がpull後に再試行)。
+   * baseHeadSha を渡すとそのcommitを親として積む楽観ロックになり、リモートが先に
+   * 進んでいた場合は ref更新がnon-fast-forwardで失敗して kind:'conflict' を投げる
+   * (呼び出し側がpull+マージ後に再試行)。
    */
   async commitFiles(
     changes: FileChange[],
     message: string,
+    baseHeadSha?: string,
   ): Promise<{ commitSha: string; blobShas: Map<string, string> }> {
-    const headSha = await this.getHeadCommitSha();
+    const headSha = baseHeadSha ?? (await this.getHeadCommitSha());
     const headCommit = await this.request<{ tree: { sha: string } }>(
       'GET',
       `${this.repoPath}/git/commits/${headSha}`,
