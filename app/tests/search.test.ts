@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Paper } from '../src/types';
-import { collectTags, filterPapers } from '../src/lib/search';
+import { collectTags, filterPapers, suggestTags } from '../src/lib/search';
 import { DEFAULT_FILTER } from '../src/types';
 
 const paper = (over: Partial<Paper>): Paper => ({
@@ -70,5 +70,22 @@ describe('filterPapers', () => {
 describe('collectTags', () => {
   it('頻度降順→辞書順', () => {
     expect(collectTags(papers)).toEqual(['機械学習', 'NLP', '画像認識', '量子計算']);
+  });
+});
+
+describe('suggestTags', () => {
+  const all = ['機械学習', 'NLP', '画像認識', '量子計算'];
+
+  it('空入力では頻度順の候補(付与済みは除外)', () => {
+    expect(suggestTags(all, ['NLP'], '')).toEqual(['機械学習', '画像認識', '量子計算']);
+  });
+
+  it('入力テキストで部分一致(大文字小文字無視)に絞り込む', () => {
+    expect(suggestTags(all, [], '認識')).toEqual(['画像認識']);
+    expect(suggestTags(all, [], 'nlp')).toEqual(['NLP']);
+  });
+
+  it('limitで件数を制限する', () => {
+    expect(suggestTags(all, [], '', 2)).toEqual(['機械学習', 'NLP']);
   });
 });

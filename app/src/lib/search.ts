@@ -31,6 +31,20 @@ export function filterPapers<T extends Paper>(papers: T[], f: Filter): T[] {
   return list;
 }
 
+/** タグ入力の補完候補: 使用頻度順のallTagsを部分一致で絞り込み、付与済みタグは除外 */
+export function suggestTags(allTags: string[], exclude: string[], query: string, limit = 8): string[] {
+  const q = query.trim().toLowerCase();
+  const ex = new Set(exclude);
+  const out: string[] = [];
+  for (const t of allTags) {
+    if (ex.has(t)) continue;
+    if (q && !t.toLowerCase().includes(q)) continue;
+    out.push(t);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
 /** 全論文からタグ一覧(使用頻度降順 → 同数は辞書順) */
 export function collectTags(papers: Paper[]): string[] {
   const counts = new Map<string, number>();
