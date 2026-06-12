@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectIdentifier, parseIdentifierLines } from '../src/lib/identifiers';
+import { detectIdentifier, normalizePip, parseIdentifierLines } from '../src/lib/identifiers';
 
 describe('detectIdentifier', () => {
   it('素のDOI / doi.org URL / doi:プレフィックス', () => {
@@ -37,5 +37,17 @@ describe('parseIdentifierLines', () => {
     const { ids, invalid } = parseIdentifierLines('10.1000/a\n1706.03762, garbage\n\n');
     expect(ids).toHaveLength(2);
     expect(invalid).toEqual(['garbage']);
+  });
+});
+
+describe('normalizePip', () => {
+  it('数字のみは5桁ゼロ詰め、空はundefined、その他はそのまま', () => {
+    expect(normalizePip('28')).toBe('00028');
+    expect(normalizePip('00028')).toBe('00028');
+    expect(normalizePip('  407 ')).toBe('00407');
+    expect(normalizePip('')).toBeUndefined();
+    expect(normalizePip('  ')).toBeUndefined();
+    expect(normalizePip('A-12')).toBe('A-12');
+    expect(normalizePip('123456')).toBe('123456'); // 6桁以上はそのまま
   });
 });

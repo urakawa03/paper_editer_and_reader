@@ -2,20 +2,27 @@ import { useState } from 'react';
 import type { StoredPaper } from '../../types';
 import { useAppStore } from '../../data/store';
 import { mutatePaper } from '../../data/mutations';
+import { normalizePip } from '../../lib/identifiers';
 import { useDebouncedCommit } from '../../hooks/useDebouncedCommit';
 import { STATUS_LABEL, nextStatus, paperLink } from '../../components/status';
 
-/** 詳細表示(SP-5): Abstract全文・メモ編集・元論文リンク */
+/** 詳細表示(SP-5): Abstract全文・メモ編集・PIP付与・元論文リンク */
 export function FeedDetail({ paper }: { paper: StoredPaper }) {
   const setDetailOpen = useAppStore((s) => s.setDetailOpen);
   const [notes, setNotes] = useState(paper.notes);
+  const [pip, setPip] = useState(paper.pip ?? '');
 
   const commit = useDebouncedCommit(() => {
     if (notes !== paper.notes) void mutatePaper(paper.id, { notes });
   });
+  const pipCommit = useDebouncedCommit(() => {
+    const np = normalizePip(pip);
+    if ((np ?? '') !== (paper.pip ?? '')) void mutatePaper(paper.id, { pip: np });
+  });
 
   const close = () => {
     commit.flush();
+    pipCommit.flush();
     setDetailOpen(false);
   };
   const link = paperLink(paper);
@@ -54,6 +61,22 @@ export function FeedDetail({ paper }: { paper: StoredPaper }) {
           </div>
           <h2 className="pfd-title">{paper.title || paper.id}</h2>
           <div className="pf-authors">{paper.authors.join(', ')}</div>
+          <label className="pfd-pip">
+            PIP
+            <input
+              value={pip}
+              placeholder="00000"
+              inputMode="numeric"
+              onChange={(e) => {
+                setPip(e.target.value);
+                pipCommit.call();
+              }}
+              onBlur={() => {
+                pipCommit.flush();
+                setPip(normalizePip(pip) ?? '');
+              }}
+            />
+          </label>
           {paper.tags.length > 0 && (
             <div className="pf-chips">
               {paper.tags.map((t) => (

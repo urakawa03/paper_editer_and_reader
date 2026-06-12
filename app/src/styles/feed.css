@@ -150,6 +150,34 @@
   font-weight: 600;
   color: var(--accent);
 }
+.pf-pip {
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+}
+.pfd-pip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 4px 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+}
+.pfd-pip input {
+  border: none;
+  border-bottom: 1px dashed var(--line);
+  background: transparent;
+  font-size: 16px; /* 16px未満はiOSの自動ズームを誘発する */
+  color: var(--ink-body);
+  outline: none;
+  width: 84px;
+  padding: 1px 0;
+}
+.pfd-pip input:focus {
+  border-bottom-color: var(--accent);
+}
 .pf-dot {
   width: 3px;
   height: 3px;

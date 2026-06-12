@@ -72,6 +72,7 @@ export function parsePaperMarkdown(md: string, fallbackId?: string): Paper {
 
   return {
     id,
+    pip: asOptional(fm.pip),
     title: asOptional(fm.title) ?? '',
     authors: asStringArray(fm.authors),
     year: Number.isFinite(yearNum) ? Math.trunc(yearNum) : 0,
@@ -99,6 +100,7 @@ const arr = (xs: string[]) => `[${xs.map(q).join(', ')}]`;
 export function serializePaperMarkdown(p: Paper): string {
   const lines: string[] = ['---'];
   lines.push(`id: ${p.id}`);
+  if (p.pip) lines.push(`pip: ${q(p.pip)}`);
   lines.push(`title: ${q(p.title)}`);
   lines.push(`authors: ${arr(p.authors)}`);
   lines.push(`year: ${p.year}`);
