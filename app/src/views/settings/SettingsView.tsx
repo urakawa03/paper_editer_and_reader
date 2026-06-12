@@ -115,6 +115,17 @@ export function SettingsView({ onboarding = false }: { onboarding?: boolean }) {
           <option value="dark">ダーク</option>
         </select>
       </div>
+      <div className="field">
+        <label>フィードの動作</label>
+        <label className="check-line">
+          <input
+            type="checkbox"
+            checked={settings?.ui.autoReading ?? true}
+            onChange={(e) => void updateUiSettings({ autoReading: e.target.checked })}
+          />
+          詳細を開いたら未読を自動で「読書中」にする
+        </label>
+      </div>
 
       {checkResult && <div className={'check-result ' + (checkResult.ok ? 'ok' : 'ng')}>{checkResult.message}</div>}
 

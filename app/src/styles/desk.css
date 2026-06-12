@@ -92,6 +92,25 @@
   padding: 4px 10px;
   font-size: 11.5px;
 }
+.desk-spacer {
+  margin-left: auto;
+}
+.desk-tool {
+  font-size: 11.5px;
+  padding: 4px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.desk-tool:hover:not(:disabled) {
+  background: var(--hover);
+}
+.desk-tool:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 .desk-sort {
   margin-left: auto;
   font-size: 11.5px;
@@ -110,6 +129,8 @@
 }
 
 .row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 96px;
   padding: 13px 15px;
   border-bottom: 1px solid var(--line);
   cursor: pointer;

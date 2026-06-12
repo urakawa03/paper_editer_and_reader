@@ -43,6 +43,7 @@ export default function App() {
   const settings = useAppStore((s) => s.settings);
   const addModalOpen = useAppStore((s) => s.addModalOpen);
   const settingsOpen = useAppStore((s) => s.settingsOpen);
+  const applyUpdate = useAppStore((s) => s.applyUpdate);
   const mode = useViewMode();
 
   useEffect(() => {
@@ -76,6 +77,12 @@ export default function App() {
       {mode === 'desk' ? <DeskView /> : <FeedView />}
       {addModalOpen && <AddPaperModal />}
       {settingsOpen && <SettingsView />}
+      {applyUpdate && (
+        <div className="update-toast" role="status">
+          新しいバージョンがあります
+          <button onClick={applyUpdate}>更新</button>
+        </div>
+      )}
     </>
   );
 }
