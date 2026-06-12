@@ -47,3 +47,10 @@ export function parseIdentifierLines(text: string): { ids: DetectedId[]; invalid
   }
   return { ids, invalid };
 }
+
+/** PIP(個人管理番号)の正規化: 数字のみなら5桁ゼロ詰め、空はundefined、それ以外はそのまま */
+export function normalizePip(raw: string): string | undefined {
+  const s = raw.trim();
+  if (!s) return undefined;
+  return /^\d{1,5}$/.test(s) ? s.padStart(5, '0') : s;
+}

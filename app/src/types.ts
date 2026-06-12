@@ -3,6 +3,8 @@ export type PaperStatus = 'unread' | 'reading' | 'read';
 /** 1論文 = papers/{id}.md。frontmatter(§3.2) + ## Abstract / ## Notes */
 export interface Paper {
   id: string;
+  /** 個人管理番号(5桁ゼロ詰め推奨)。Notion由来のインポートではファイル名先頭にも付く */
+  pip?: string;
   title: string;
   authors: string[];
   year: number;

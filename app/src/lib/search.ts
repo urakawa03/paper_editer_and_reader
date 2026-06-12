@@ -1,7 +1,7 @@
 import type { Filter, Paper } from '../types';
 
 function haystack(p: Paper): string {
-  return `${p.title} ${p.authors.join(' ')} ${p.tags.join(' ')} ${p.abstract} ${p.notes}`.toLowerCase();
+  return `${p.title} ${p.authors.join(' ')} ${p.tags.join(' ')} ${p.abstract} ${p.notes} ${p.pip ?? ''}`.toLowerCase();
 }
 
 /**

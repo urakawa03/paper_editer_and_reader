@@ -98,4 +98,15 @@ describe('serializePaperMarkdown', () => {
     const out = serializePaperMarkdown(p);
     expect(parsePaperMarkdown(out).title).toBe('A "quoted" title with newline');
   });
+
+  it('pip(個人管理番号)はゼロ詰めのままroundtripし、無ければ行ごと省略される', () => {
+    const p = parsePaperMarkdown(read('vaswani2017attention.md'));
+    expect(p.pip).toBeUndefined();
+    expect(serializePaperMarkdown(p)).not.toContain('pip:');
+
+    p.pip = '00028';
+    const out = serializePaperMarkdown(p);
+    expect(out).toContain('pip: "00028"');
+    expect(parsePaperMarkdown(out).pip).toBe('00028');
+  });
 });

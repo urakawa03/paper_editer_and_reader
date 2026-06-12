@@ -26,6 +26,7 @@ function mergeTags(base: string[], local: string[], remote: string[]): string[] 
 export function toPaper(p: StoredPaper | Paper): Paper {
   return {
     id: p.id,
+    pip: p.pip,
     title: p.title,
     authors: p.authors,
     year: p.year,
@@ -54,6 +55,7 @@ export function mergePaper(base: Paper | null, local: Paper, remote: Paper): Pap
 
   return {
     id: local.id,
+    pip: pick('pip'),
     title: pick('title'),
     authors: pick('authors'),
     year: pick('year'),

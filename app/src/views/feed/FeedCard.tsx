@@ -36,6 +36,12 @@ export const FeedCard = memo(function FeedCard({ paper }: { paper: StoredPaper }
   return (
     <article className="pf-card">
       <div className="pf-meta">
+        {paper.pip && (
+          <>
+            <span className="pf-pip">PIP {paper.pip}</span>
+            <span className="pf-dot" />
+          </>
+        )}
         {paper.venue && (
           <>
             <span className="pf-venue">{paper.venue}</span>
