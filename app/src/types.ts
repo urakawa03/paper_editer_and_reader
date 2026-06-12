@@ -52,6 +52,8 @@ export type Theme = 'auto' | 'light' | 'dark';
 export interface UiSettings {
   viewOverride: ViewOverride;
   theme: Theme;
+  /** 詳細を開いたら未読→読書中に自動変更(SP)。既定ON */
+  autoReading?: boolean;
 }
 
 export interface AppSettings {
@@ -76,7 +78,7 @@ export interface RefEntry {
 
 export type SyncStatusKind = 'synced' | 'saving' | 'pending';
 
-export type SortKey = 'added' | 'updated' | 'year' | 'title';
+export type SortKey = 'added' | 'updated' | 'year' | 'title' | 'pip';
 
 /** 既読フィルタ: unread = status≠read(読書中含む), read = status=read */
 export type ReadFilter = 'all' | 'unread' | 'read';
@@ -91,7 +93,7 @@ export interface Filter {
   dir: 'asc' | 'desc';
 }
 
-export const DEFAULT_UI: UiSettings = { viewOverride: 'auto', theme: 'auto' };
+export const DEFAULT_UI: UiSettings = { viewOverride: 'auto', theme: 'auto', autoReading: true };
 export const DEFAULT_FILTER: Filter = {
   query: '',
   mode: 'AND',

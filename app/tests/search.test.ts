@@ -65,6 +65,15 @@ describe('filterPapers', () => {
     expect(filterPapers(papers, { ...DEFAULT_FILTER, sort: 'title', dir: 'asc' })[0].id).toBe('c');
     expect(filterPapers(papers, { ...DEFAULT_FILTER, sort: 'added', dir: 'desc' }).map((p) => p.id)).toEqual(['a', 'b', 'c']);
   });
+
+  it('PIP順ソート: ゼロ詰め番号の昇順、未設定は末尾', () => {
+    const ps = [
+      paper({ id: 'x', pip: '00100' }),
+      paper({ id: 'y' }),
+      paper({ id: 'z', pip: '00002' }),
+    ];
+    expect(filterPapers(ps, { ...DEFAULT_FILTER, sort: 'pip', dir: 'asc' }).map((p) => p.id)).toEqual(['z', 'x', 'y']);
+  });
 });
 
 describe('collectTags', () => {

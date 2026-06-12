@@ -25,6 +25,8 @@ export function filterPapers<T extends Paper>(papers: T[], f: Filter): T[] {
     title: (a, b) => a.title.localeCompare(b.title, 'ja'),
     added: (a, b) => a.added_at.localeCompare(b.added_at),
     updated: (a, b) => a.updated_at.localeCompare(b.updated_at),
+    // PIP未設定は末尾(昇順時)に寄せる
+    pip: (a, b) => (a.pip ?? '￿').localeCompare(b.pip ?? '￿'),
   };
   list = [...list].sort(cmp[f.sort]);
   if (f.dir === 'desc') list.reverse();

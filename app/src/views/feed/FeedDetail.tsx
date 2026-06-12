@@ -1,16 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { StoredPaper } from '../../types';
 import { useAppStore } from '../../data/store';
 import { mutatePaper } from '../../data/mutations';
 import { normalizePip } from '../../lib/identifiers';
+import { renderMarkdownLite } from '../../lib/mdlite';
 import { useDebouncedCommit } from '../../hooks/useDebouncedCommit';
+import { RefetchButton } from '../../components/RefetchButton';
 import { STATUS_LABEL, nextStatus, paperLink } from '../../components/status';
 
-/** 詳細表示(SP-5): Abstract全文・メモ編集・PIP付与・元論文リンク */
+/** 詳細表示(SP-5): Abstract全文・メモ編集(Markdown表示)・PIP付与・書誌再取得・元論文リンク */
 export function FeedDetail({ paper }: { paper: StoredPaper }) {
   const setDetailOpen = useAppStore((s) => s.setDetailOpen);
+  const autoReading = useAppStore((s) => s.settings?.ui.autoReading ?? true);
   const [notes, setNotes] = useState(paper.notes);
   const [pip, setPip] = useState(paper.pip ?? '');
+  const [editingNotes, setEditingNotes] = useState(paper.notes.trim() === '');
+
+  // 開いたら未読→読書中(設定でOFF可)。key=paper.idで論文ごとに一度だけ走る
+  useEffect(() => {
+    if (autoReading && paper.status === 'unread') void mutatePaper(paper.id, { status: 'reading' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const commit = useDebouncedCommit(() => {
     if (notes !== paper.notes) void mutatePaper(paper.id, { notes });
@@ -99,22 +109,45 @@ export function FeedDetail({ paper }: { paper: StoredPaper }) {
           </div>
 
           <div className="pfd-section">
-            <p className="ed-section-label">Notes（自分のメモ）</p>
-            <textarea
-              className="pfd-notes"
-              value={notes}
-              placeholder="読みながら気づいたことを書く…"
-              onChange={(e) => {
-                setNotes(e.target.value);
-                commit.call();
-              }}
-              onFocus={(e) => {
-                // ソフトキーボード表示後に入力欄を見える位置へ戻す
-                const el = e.currentTarget;
-                setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
-              }}
-              onBlur={commit.flush}
-            />
+            <div className="pfd-notes-head">
+              <p className="ed-section-label">Notes（自分のメモ）</p>
+              {notes.trim() !== '' && (
+                <button
+                  className="pfd-notes-toggle"
+                  onClick={() => {
+                    if (editingNotes) commit.flush();
+                    setEditingNotes(!editingNotes);
+                  }}
+                >
+                  {editingNotes ? '✓ 完了' : '✎ 編集'}
+                </button>
+              )}
+            </div>
+            {editingNotes ?
+              <textarea
+                className="pfd-notes"
+                value={notes}
+                autoFocus={notes.trim() !== ''}
+                placeholder="読みながら気づいたことを書く…"
+                onChange={(e) => {
+                  setNotes(e.target.value);
+                  commit.call();
+                }}
+                onFocus={(e) => {
+                  // ソフトキーボード表示後に入力欄を見える位置へ戻す
+                  const el = e.currentTarget;
+                  setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+                }}
+                onBlur={commit.flush}
+              />
+            : <div className="pfd-notes-view" onClick={() => setEditingNotes(true)}>
+                {renderMarkdownLite(notes)}
+              </div>
+            }
+          </div>
+
+          <div className="pfd-tools">
+            <RefetchButton paper={paper} btnClass="pf-act" />
           </div>
 
           {link && (

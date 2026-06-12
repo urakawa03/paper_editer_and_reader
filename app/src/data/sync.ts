@@ -27,6 +27,8 @@ import { useAppStore } from './store';
 const DEBOUNCE_MS = 3000;
 const MAX_WAIT_MS = 30000;
 const PULL_CONCURRENCY = 6;
+/** 表示中の定期pull間隔。HEAD未変更なら1リクエストで終わるためレート消費は軽い */
+const PULL_INTERVAL_MS = 75000;
 const META_HEAD = 'lastRemoteCommitSha';
 
 let pushTimer: ReturnType<typeof setTimeout> | null = null;
@@ -355,6 +357,12 @@ export function initSyncEngine(): void {
     window.addEventListener('offline', () => {
       void refreshSyncStatus(false);
     });
+    // 別端末の変更を「ほぼライブ」で反映する定期pull(表示中のみ)
+    window.setInterval(() => {
+      if (document.visibilityState === 'visible' && navigator.onLine !== false) {
+        void pull().catch(() => {});
+      }
+    }, PULL_INTERVAL_MS);
   }
 }
 

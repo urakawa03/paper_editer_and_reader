@@ -195,6 +195,26 @@
   background: var(--reading);
 }
 
+/* 大量カード対策: 画面外はレイアウト/描画をスキップ。スワイプは横ジェスチャのみ受ける */
+.pf-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 230px;
+  touch-action: pan-y;
+  transition: transform 0.18s ease, opacity 0.2s, box-shadow 0.15s;
+}
+.pf-card.read {
+  opacity: 0.55;
+}
+.pf-card.dragging {
+  transition: opacity 0.2s, box-shadow 0.15s;
+}
+.pf-card.will-read {
+  box-shadow: inset 4px 0 0 #4c9a62;
+}
+.pf-card.will-like {
+  box-shadow: inset -4px 0 0 var(--accent);
+}
+
 .pf-title {
   font-family: var(--font-display);
   font-weight: 600;
@@ -385,4 +405,66 @@
   display: inline-block;
   margin-top: 18px;
   font-size: 14px;
+}
+.pfd-notes-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pfd-notes-toggle {
+  border: none;
+  background: transparent;
+  color: var(--accent-deep);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.pfd-notes-view {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 13px 15px;
+  background: var(--paper-2);
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--ink-body);
+  min-height: 48px;
+}
+.pfd-notes-view > :first-child {
+  margin-top: 0;
+}
+.pfd-notes-view > :last-child {
+  margin-bottom: 0;
+}
+.pfd-notes-view p {
+  margin: 0 0 10px;
+}
+.pfd-notes-view h3,
+.pfd-notes-view h4,
+.pfd-notes-view h5 {
+  margin: 14px 0 6px;
+  line-height: 1.3;
+}
+.pfd-notes-view ul {
+  margin: 0 0 10px;
+  padding-left: 1.3em;
+}
+.pfd-notes-view code {
+  background: var(--hover);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.9em;
+}
+.pfd-tools {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pfd-tools .pf-act {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 6px 11px;
 }

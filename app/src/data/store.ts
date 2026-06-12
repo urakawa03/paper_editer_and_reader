@@ -15,6 +15,8 @@ export interface AppState {
   addModalOpen: boolean;
   settingsOpen: boolean;
   detailOpen: boolean;
+  /** PWAの新バージョン適用関数(あり=更新トースト表示) */
+  applyUpdate: (() => void) | null;
 
   setPapers: (papers: StoredPaper[]) => void;
   upsertPapers: (papers: StoredPaper[]) => void;
@@ -28,6 +30,7 @@ export interface AppState {
   setSettingsOpen: (open: boolean) => void;
   setDetailOpen: (open: boolean) => void;
   setLoaded: (loaded: boolean) => void;
+  setApplyUpdate: (fn: (() => void) | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -43,6 +46,7 @@ export const useAppStore = create<AppState>((set) => ({
   addModalOpen: false,
   settingsOpen: false,
   detailOpen: false,
+  applyUpdate: null,
 
   setPapers: (papers) =>
     set({ papers: Object.fromEntries(papers.map((p) => [p.id, p])) }),
@@ -73,4 +77,5 @@ export const useAppStore = create<AppState>((set) => ({
   setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
   setDetailOpen: (detailOpen) => set({ detailOpen }),
   setLoaded: (loaded) => set({ loaded }),
+  setApplyUpdate: (applyUpdate) => set({ applyUpdate }),
 }));

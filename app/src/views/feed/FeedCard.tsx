@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 import type { StoredPaper } from '../../types';
 import { useAppStore } from '../../data/store';
 import { mutatePaper } from '../../data/mutations';
@@ -19,9 +19,14 @@ const CheckIcon = () => (
   </svg>
 );
 
-/** フィードカード(SP-2) + いいね・メモ・既読(SP-4: 即時反映+遅延同期) */
+/**
+ * フィードカード(SP-2) + いいね・メモ・既読(SP-4: 即時反映+遅延同期)。
+ * スワイプ: 右=既読トグル / 左=いいねトグル(縦スクロールが優勢な間は発動しない)
+ */
 export const FeedCard = memo(function FeedCard({ paper }: { paper: StoredPaper }) {
   const [open, setOpen] = useState(false);
+  const [dx, setDx] = useState(0);
+  const drag = useRef<{ x: number; y: number; mode: 'pending' | 'h' | 'cancel' } | null>(null);
   const select = useAppStore((s) => s.select);
   const setDetailOpen = useAppStore((s) => s.setDetailOpen);
   const setFilter = useAppStore((s) => s.setFilter);
@@ -33,8 +38,57 @@ export const FeedCard = memo(function FeedCard({ paper }: { paper: StoredPaper }
   };
   const isRead = paper.status === 'read';
 
+  const SWIPE_FIRE = 76;
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    drag.current = { x: t.clientX, y: t.clientY, mode: 'pending' };
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    const d = drag.current;
+    if (!d || d.mode === 'cancel') return;
+    const t = e.touches[0];
+    const mx = t.clientX - d.x;
+    const my = t.clientY - d.y;
+    if (d.mode === 'pending') {
+      if (Math.abs(my) > 12 && Math.abs(my) > Math.abs(mx)) {
+        d.mode = 'cancel'; // 縦スクロールが先に始まったら譲る
+        return;
+      }
+      if (Math.abs(mx) > 16 && Math.abs(mx) > Math.abs(my) * 1.4) d.mode = 'h';
+      else return;
+    }
+    setDx(Math.max(-110, Math.min(110, mx)));
+  };
+  const onTouchEnd = () => {
+    const d = drag.current;
+    drag.current = null;
+    if (d?.mode === 'h') {
+      if (dx >= SWIPE_FIRE) {
+        void mutatePaper(paper.id, { status: isRead ? 'unread' : 'read' });
+        navigator.vibrate?.(12);
+      } else if (dx <= -SWIPE_FIRE) {
+        void mutatePaper(paper.id, { liked: !paper.liked });
+        navigator.vibrate?.(12);
+      }
+    }
+    setDx(0);
+  };
+
+  const cls =
+    'pf-card' +
+    (isRead ? ' read' : '') +
+    (dx !== 0 ? ' dragging' : '') +
+    (dx >= SWIPE_FIRE ? ' will-read' : dx <= -SWIPE_FIRE ? ' will-like' : '');
+
   return (
-    <article className="pf-card">
+    <article
+      className={cls}
+      style={dx !== 0 ? { transform: `translateX(${dx}px)` } : undefined}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onTouchCancel={onTouchEnd}
+    >
       <div className="pf-meta">
         {paper.pip && (
           <>

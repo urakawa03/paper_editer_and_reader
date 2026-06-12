@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import '../../styles/feed.css';
 import { useAppStore } from '../../data/store';
 import { collectTags, filterPapers } from '../../lib/search';
+import { dailyPicks } from '../../lib/pick';
 import { ModeSeg, SearchBar } from '../../components/SearchBar';
 import { FilterChips } from '../../components/FilterChips';
 import { HeaderActions } from '../../components/HeaderActions';
@@ -13,6 +14,7 @@ const SORT_OPTIONS: { value: string; label: string }[] = [
   { value: 'added:desc', label: '追加順' },
   { value: 'updated:desc', label: '更新順' },
   { value: 'year:desc', label: '年(新)' },
+  { value: 'pip:asc', label: 'PIP順' },
 ];
 
 /** スマホ フィード閲覧ビュー(§5.B): カード縦スクロール(SP-1) */
@@ -23,9 +25,16 @@ export function FeedView() {
   const detailOpen = useAppStore((s) => s.detailOpen);
   const selectedId = useAppStore((s) => s.selectedId);
 
+  const [daily, setDaily] = useState(false);
+
   const papers = useMemo(() => Object.values(papersMap), [papersMap]);
   const filtered = useMemo(() => filterPapers(papers, filter), [papers, filter]);
   const allTags = useMemo(() => collectTags(papers), [papers]);
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const shown = useMemo(
+    () => (daily ? dailyPicks(papers, todayKey) : filtered),
+    [daily, papers, todayKey, filtered],
+  );
 
   const toggleTag = (t: string) =>
     setFilter({ tags: filter.tags.includes(t) ? filter.tags.filter((x) => x !== t) : [...filter.tags, t] });
@@ -47,6 +56,13 @@ export function FeedView() {
           <div className="pf-controls">
             <ModeSeg />
             <FilterChips />
+            <button
+              className={'chip-like' + (daily ? ' on' : '')}
+              title="未読・読書中から日替わりで3本だけ表示"
+              onClick={() => setDaily(!daily)}
+            >
+              🎲 今日の3本
+            </button>
             <select
               value={SORT_OPTIONS.some((o) => o.value === sortValue) ? sortValue : 'added:desc'}
               onChange={(e) => {
@@ -71,7 +87,7 @@ export function FeedView() {
         </div>
 
         <div className="pf-feed">
-          {filtered.length === 0 && (
+          {shown.length === 0 && (
             <div className="pf-empty">
               {papers.length === 0 ? (
                 <>
@@ -88,7 +104,7 @@ export function FeedView() {
               )}
             </div>
           )}
-          {filtered.map((p) => (
+          {shown.map((p) => (
             <FeedCard key={p.id} paper={p} />
           ))}
         </div>
