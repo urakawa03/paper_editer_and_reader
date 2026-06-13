@@ -110,3 +110,71 @@ describe('serializePaperMarkdown', () => {
     expect(parsePaperMarkdown(out).pip).toBe('00028');
   });
 });
+
+describe('v2スキーマ(type + 書誌フィールド)', () => {
+  const V2 = [
+    '---',
+    'id: smith2020bananas',
+    'pip: "00014"',
+    'type: inproceedings',
+    'title: "A Study"',
+    'authors: ["Smith, John"]',
+    'year: 2020',
+    'venue: "ICPS"',
+    'booktitle: "Proceedings of ICPS 2020"',
+    'volume: "42"',
+    'number: "3"',
+    'pages: "101-115"',
+    'publisher: "Academic Press"',
+    'address: "Tokyo"',
+    'edition: "2nd"',
+    'howpublished: "Online"',
+    'note: "preprint有り"',
+    'doi: "10.1234/x"',
+    'url: "https://example.com"',
+    'tags: ["a"]',
+    'liked: false',
+    'status: unread',
+    'added_at: 2026-06-01T12:00:00Z',
+    'updated_at: 2026-06-01T12:00:00Z',
+    '---',
+    '',
+    '## Abstract',
+    'abc',
+    '',
+    '## Notes',
+    '',
+  ].join('\n');
+
+  it('全v2フィールドをパースする', () => {
+    const p = parsePaperMarkdown(V2);
+    expect(p.type).toBe('inproceedings');
+    expect(p.booktitle).toBe('Proceedings of ICPS 2020');
+    expect(p.volume).toBe('42');
+    expect(p.number).toBe('3');
+    expect(p.pages).toBe('101-115');
+    expect(p.publisher).toBe('Academic Press');
+    expect(p.address).toBe('Tokyo');
+    expect(p.edition).toBe('2nd');
+    expect(p.howpublished).toBe('Online');
+    expect(p.note).toBe('preprint有り');
+  });
+
+  it('v2フィールドが固定キー順でroundtripする', () => {
+    expect(serializePaperMarkdown(parsePaperMarkdown(V2))).toBe(V2);
+  });
+
+  it('不正なtypeはundefinedに落ち、出力されない', () => {
+    const p = parsePaperMarkdown('---\nid: x\ntype: journal\ntitle: "t"\n---\n');
+    expect(p.type).toBeUndefined();
+    expect(serializePaperMarkdown(p)).not.toContain('type:');
+  });
+
+  it('type:articleは明示時のみ出力(parse(serialize(p))≡p)', () => {
+    const p = parsePaperMarkdown('---\nid: x\ntype: article\ntitle: "t"\n---\n');
+    expect(p.type).toBe('article');
+    const out = serializePaperMarkdown(p);
+    expect(out).toContain('type: article');
+    expect(parsePaperMarkdown(out)).toEqual(p);
+  });
+});

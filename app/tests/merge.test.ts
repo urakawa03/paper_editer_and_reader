@@ -51,4 +51,14 @@ describe('mergePaper', () => {
     expect(m.notes).toBe('remote');
     expect(m.liked).toBe(false); // 全体採用なのでローカルのlikedは残らない
   });
+
+  it('書誌フィールドもフィールド単位3-wayマージされる', () => {
+    const base = paper();
+    const local = paper({ volume: '10', updated_at: '2026-01-02T00:00:00Z' }); // 巻を追加
+    const remote = paper({ pages: '1-9', type: 'inproceedings', updated_at: '2026-01-03T00:00:00Z' }); // ページ/種別を追加
+    const m = mergePaper(base, local, remote);
+    expect(m.volume).toBe('10');
+    expect(m.pages).toBe('1-9');
+    expect(m.type).toBe('inproceedings');
+  });
 });

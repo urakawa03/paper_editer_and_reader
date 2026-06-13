@@ -1,8 +1,14 @@
-import type { Paper, PaperStatus } from '../types';
+import type { Paper, PaperStatus, PaperType } from '../types';
 import { splitFrontmatter, parseYamlObject } from './frontmatter';
 
 const EPOCH = '1970-01-01T00:00:00Z';
 const STATUSES: PaperStatus[] = ['unread', 'reading', 'read'];
+const TYPES: PaperType[] = ['article', 'book', 'inproceedings', 'misc'];
+
+function asType(v: unknown): PaperType | undefined {
+  const s = asString(v)?.trim();
+  return TYPES.includes(s as PaperType) ? (s as PaperType) : undefined;
+}
 
 export class ParseError extends Error {}
 
@@ -73,10 +79,20 @@ export function parsePaperMarkdown(md: string, fallbackId?: string): Paper {
   return {
     id,
     pip: asOptional(fm.pip),
+    type: asType(fm.type),
     title: asOptional(fm.title) ?? '',
     authors: asStringArray(fm.authors),
     year: Number.isFinite(yearNum) ? Math.trunc(yearNum) : 0,
     venue: asOptional(fm.venue),
+    booktitle: asOptional(fm.booktitle),
+    volume: asOptional(fm.volume),
+    number: asOptional(fm.number),
+    pages: asOptional(fm.pages),
+    publisher: asOptional(fm.publisher),
+    address: asOptional(fm.address),
+    edition: asOptional(fm.edition),
+    howpublished: asOptional(fm.howpublished),
+    note: asOptional(fm.note),
     doi: asOptional(fm.doi),
     url: asOptional(fm.url),
     tags: asStringArray(fm.tags),
@@ -101,10 +117,20 @@ export function serializePaperMarkdown(p: Paper): string {
   const lines: string[] = ['---'];
   lines.push(`id: ${p.id}`);
   if (p.pip) lines.push(`pip: ${q(p.pip)}`);
+  if (p.type) lines.push(`type: ${p.type}`);
   lines.push(`title: ${q(p.title)}`);
   lines.push(`authors: ${arr(p.authors)}`);
   lines.push(`year: ${p.year}`);
   if (p.venue) lines.push(`venue: ${q(p.venue)}`);
+  if (p.booktitle) lines.push(`booktitle: ${q(p.booktitle)}`);
+  if (p.volume) lines.push(`volume: ${q(p.volume)}`);
+  if (p.number) lines.push(`number: ${q(p.number)}`);
+  if (p.pages) lines.push(`pages: ${q(p.pages)}`);
+  if (p.publisher) lines.push(`publisher: ${q(p.publisher)}`);
+  if (p.address) lines.push(`address: ${q(p.address)}`);
+  if (p.edition) lines.push(`edition: ${q(p.edition)}`);
+  if (p.howpublished) lines.push(`howpublished: ${q(p.howpublished)}`);
+  if (p.note) lines.push(`note: ${q(p.note)}`);
   if (p.doi) lines.push(`doi: ${q(p.doi)}`);
   if (p.url) lines.push(`url: ${q(p.url)}`);
   lines.push(`tags: ${arr(p.tags)}`);
