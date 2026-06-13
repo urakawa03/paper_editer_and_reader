@@ -305,6 +305,53 @@
   width: 64px;
 }
 
+.ed-bib {
+  margin-bottom: 18px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.ed-bib > summary {
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 0;
+}
+.ed-bib-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 10px;
+}
+.ed-bib-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.ed-bib-grid label.wide {
+  flex-basis: 100%;
+}
+.ed-bib-grid input,
+.ed-bib-grid select {
+  border: none;
+  border-bottom: 1px dashed var(--line);
+  background: transparent;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+  width: 150px;
+  padding: 2px 0;
+}
+.ed-bib-grid label.wide input {
+  width: 100%;
+}
+.ed-bib-grid input:hover,
+.ed-bib-grid input:focus,
+.ed-bib-grid select:hover,
+.ed-bib-grid select:focus {
+  border-bottom-color: var(--accent, var(--line));
+}
+
 .ed-chips {
   display: flex;
   flex-wrap: wrap;
