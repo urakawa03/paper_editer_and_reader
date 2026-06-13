@@ -1,8 +1,36 @@
-import type { RefEntry } from '../types';
+import type { PaperType, RefEntry } from '../types';
 import { detectIdentifier } from './identifiers';
 
 // RISは行ベース: "TY  - JOUR" 〜 "ER  -"。タグ無し行は直前フィールドへの継続行。
 const TAG_RE = /^([A-Z][A-Z0-9])\s+-\s?(.*)$/;
+
+/** RIS TYコード → 内部PaperType。判定できないものはundefined(=article既定に委ねる) */
+function risTypeToPaperType(ty?: string): PaperType | undefined {
+  switch (ty) {
+    case 'JOUR':
+    case 'JFULL':
+      return 'article';
+    case 'CONF':
+    case 'CPAPER':
+      return 'inproceedings';
+    case 'BOOK':
+    case 'CHAP':
+    case 'EBOOK':
+      return 'book';
+    case 'GEN':
+    case 'UNPB':
+    case 'RPRT':
+      return 'misc';
+    default:
+      return undefined;
+  }
+}
+
+/** SP/EPからpages文字列を組む("12-34" / 片方のみなら "12") */
+function risPages(sp?: string, ep?: string): string | undefined {
+  if (sp && ep) return `${sp}-${ep}`;
+  return sp || ep || undefined;
+}
 
 interface RawEntry {
   fields: Map<string, string[]>;
@@ -29,10 +57,15 @@ function toRefEntry(e: RawEntry): RefEntry | null {
 
   const entry: RefEntry = {
     citekey: get(e, 'ID'),
+    type: risTypeToPaperType(get(e, 'TY')),
     title: get(e, 'TI', 'T1'),
     authors,
     year: Number.isFinite(year) ? year : undefined,
     venue: get(e, 'JO', 'JF', 'T2', 'JA'),
+    volume: get(e, 'VL'),
+    number: get(e, 'IS'),
+    pages: risPages(get(e, 'SP'), get(e, 'EP')),
+    publisher: get(e, 'PB'),
     doi,
     url,
     abstract: get(e, 'AB', 'N2'),
@@ -61,6 +94,7 @@ export function parseRis(text: string): RefEntry[] {
     const [, tag, value] = m;
     if (tag === 'TY') {
       cur = { fields: new Map() };
+      cur.fields.set('TY', [value]);
       lastTag = null;
       continue;
     }

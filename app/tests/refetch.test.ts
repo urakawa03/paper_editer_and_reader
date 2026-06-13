@@ -69,4 +69,22 @@ describe('buildRefetchPatch', () => {
     });
     expect(buildRefetchPatch(p, found)).toEqual({});
   });
+
+  it('書誌フィールド(巻/号/ページ/出版社/種別)も空欄のみ補完する', () => {
+    const p = paper({ volume: '10' }); // volume は入力済み
+    const enriched: RefEntry = {
+      authors: [],
+      type: 'article',
+      volume: '99',
+      number: '3',
+      pages: '1-9',
+      publisher: 'ACME',
+    };
+    const patch = buildRefetchPatch(p, enriched);
+    expect(patch.volume).toBeUndefined(); // 入力済みは上書きしない
+    expect(patch.number).toBe('3');
+    expect(patch.pages).toBe('1-9');
+    expect(patch.publisher).toBe('ACME');
+    expect(patch.type).toBe('article');
+  });
 });

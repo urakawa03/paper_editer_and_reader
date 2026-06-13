@@ -6,12 +6,19 @@ import type { Paper } from '../types';
 const esc = (s: string) => s.replace(/[{}\\]/g, '').replace(/\s+/g, ' ').trim();
 
 function entry(p: Paper): string {
-  const type = p.venue ? 'article' : 'misc';
+  const type = p.type ?? (p.venue ? 'article' : 'misc');
+  // inproceedingsはコンテナをbooktitleに、それ以外はjournalに置く
+  const containerKey = type === 'inproceedings' ? 'booktitle' : 'journal';
+  const container = type === 'inproceedings' ? (p.booktitle ?? p.venue) : p.venue;
   const fields: [string, string][] = [];
   if (p.title) fields.push(['title', `{{${esc(p.title)}}}`]); // 二重中括弧で大文字小文字を保持
   if (p.authors.length) fields.push(['author', `{${p.authors.map(esc).join(' and ')}}`]);
   if (p.year) fields.push(['year', `{${p.year}}`]);
-  if (p.venue) fields.push(['journal', `{${esc(p.venue)}}`]);
+  if (container) fields.push([containerKey, `{${esc(container)}}`]);
+  if (p.volume) fields.push(['volume', `{${esc(p.volume)}}`]);
+  if (p.number) fields.push(['number', `{${esc(p.number)}}`]);
+  if (p.pages) fields.push(['pages', `{${esc(p.pages)}}`]);
+  if (p.publisher) fields.push(['publisher', `{${esc(p.publisher)}}`]);
   if (p.doi) fields.push(['doi', `{${esc(p.doi)}}`]);
   if (p.url) fields.push(['url', `{${esc(p.url)}}`]);
   const body = fields.map(([k, v]) => `  ${k} = ${v}`).join(',\n');

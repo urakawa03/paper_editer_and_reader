@@ -44,10 +44,15 @@ function entryLabel(e: RefEntry): string {
 export function buildPaper(e: RefEntry, id: string, now: string): Paper {
   return {
     id,
+    type: e.type,
     title: e.title ?? '',
     authors: e.authors,
     year: e.year ?? 0,
     venue: e.venue,
+    volume: e.volume,
+    number: e.number,
+    pages: e.pages,
+    publisher: e.publisher,
     doi: e.doi,
     url: e.url,
     tags: [],

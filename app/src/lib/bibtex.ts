@@ -1,5 +1,26 @@
-import type { RefEntry } from '../types';
+import type { PaperType, RefEntry } from '../types';
 import { detectIdentifier } from './identifiers';
+
+/** BibTeXエントリ種別 → 内部PaperType。判定できないものはundefined(=article既定に委ねる) */
+function bibtexTypeToPaperType(type: string): PaperType | undefined {
+  switch (type) {
+    case 'article':
+      return 'article';
+    case 'inproceedings':
+    case 'conference':
+      return 'inproceedings';
+    case 'book':
+    case 'inbook':
+    case 'incollection':
+      return 'book';
+    case 'misc':
+    case 'unpublished':
+    case 'techreport':
+      return 'misc';
+    default:
+      return undefined;
+  }
+}
 
 // 制約付きBibTeXパーサ(§4):
 //  - @type{key, field = {…} | "…" | 123 | macro # "…"} に対応
@@ -165,10 +186,15 @@ function toRefEntry(key: string, type: string, f: RawField): RefEntry | null {
   const yearNum = f.year ? Number(/\d{4}/.exec(f.year)?.[0]) : undefined;
   return {
     citekey: key || undefined,
+    type: bibtexTypeToPaperType(type),
     title: f.title ? latexToText(f.title) : undefined,
     authors: f.author ? splitAuthors(f.author) : [],
     year: Number.isFinite(yearNum) ? yearNum : undefined,
     venue: latexToText(f.journal ?? f.booktitle ?? (type === 'phdthesis' || type === 'mastersthesis' ? (f.school ?? '') : '')) || undefined,
+    volume: f.volume?.trim() || undefined,
+    number: f.number?.trim() || undefined,
+    pages: f.pages ? latexToText(f.pages) : undefined,
+    publisher: f.publisher ? latexToText(f.publisher) : undefined,
     doi: doiRaw || undefined,
     url: f.url?.trim() || undefined,
     abstract: f.abstract ? latexToText(f.abstract) : undefined,

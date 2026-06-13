@@ -1,4 +1,4 @@
-import type { RefEntry } from '../types';
+import type { PaperType, RefEntry } from '../types';
 
 // メタデータ・abstract取得の多段フォールバック(§4.3)。
 // Crossref / Semantic Scholar はCORS対応でブラウザから直接呼べる。
@@ -30,9 +30,31 @@ interface CrossrefWork {
   'published-online'?: { 'date-parts'?: number[][] };
   'container-title'?: string[];
   'short-container-title'?: string[];
+  volume?: string;
+  issue?: string;
+  page?: string;
+  publisher?: string;
+  type?: string;
   DOI?: string;
   URL?: string;
   abstract?: string;
+}
+
+/** Crossref work type → 内部PaperType。判定できないものはundefined(=article既定に委ねる) */
+export function crossrefTypeToPaperType(t?: string): PaperType | undefined {
+  switch (t) {
+    case 'journal-article':
+      return 'article';
+    case 'proceedings-article':
+      return 'inproceedings';
+    case 'book':
+    case 'monograph':
+    case 'edited-book':
+    case 'reference-book':
+      return 'book';
+    default:
+      return undefined;
+  }
 }
 
 export async function fetchCrossref(doi: string, mailto?: string): Promise<Partial<RefEntry>> {
@@ -54,6 +76,11 @@ export async function fetchCrossref(doi: string, mailto?: string): Promise<Parti
     authors,
     year,
     venue: msg['container-title']?.[0] ?? msg['short-container-title']?.[0],
+    volume: msg.volume,
+    number: msg.issue,
+    pages: msg.page,
+    publisher: msg.publisher,
+    type: crossrefTypeToPaperType(msg.type),
     doi: msg.DOI ?? doi,
     url: msg.URL,
     abstract: msg.abstract ? jatsToPlain(msg.abstract) : undefined,
@@ -97,6 +124,11 @@ function mergeMissing(base: RefEntry, found: Partial<RefEntry>): RefEntry {
     authors: base.authors.length ? base.authors : (found.authors ?? []),
     year: base.year ?? found.year,
     venue: base.venue || found.venue,
+    volume: base.volume || found.volume,
+    number: base.number || found.number,
+    pages: base.pages || found.pages,
+    publisher: base.publisher || found.publisher,
+    type: base.type ?? found.type,
     doi: base.doi || found.doi,
     url: base.url || found.url,
     abstract: base.abstract || found.abstract,

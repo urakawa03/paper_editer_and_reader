@@ -18,6 +18,9 @@ describe('parseBibtex', () => {
     expect(e.year).toBe(1935);
     expect(e.doi).toBe('10.1103/PhysRev.47.777');
     expect(e.title).toMatch(/^Can Quantum-Mechanical/);
+    expect(e.type).toBe('article');
+    expect(e.volume).toBe('47');
+    expect(e.pages).toBe('777–780'); // -- はlatexToTextでendashに正規化
   });
 
   it('eprint+archivePrefix→arxivId、othersの除去、ネスト波括弧', () => {
@@ -27,6 +30,7 @@ describe('parseBibtex', () => {
     expect(e.year).toBe(2017);
     expect(e.venue).toBe('Advances in Neural Information Processing Systems');
     expect(e.abstract).toContain('the Transformer, based "solely" on attention');
+    expect(e.type).toBe('inproceedings');
   });
 
   it('LaTeXアクセント変換と引用符値', () => {

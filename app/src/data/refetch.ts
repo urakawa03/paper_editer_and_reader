@@ -12,6 +12,11 @@ const FIELD_LABEL: Record<string, string> = {
   authors: '著者',
   year: '年',
   venue: '誌名',
+  volume: '巻',
+  number: '号',
+  pages: 'ページ',
+  publisher: '出版社',
+  type: '種別',
   doi: 'DOI',
   url: 'URL',
   abstract: 'Abstract',
@@ -40,6 +45,11 @@ export function buildRefetchPatch(p: Paper, found: RefEntry): Partial<Paper> {
   if (p.authors.length === 0 && found.authors.length > 0) patch.authors = found.authors;
   if (!p.year && found.year) patch.year = found.year;
   if (!p.venue && found.venue) patch.venue = found.venue;
+  if (!p.volume && found.volume) patch.volume = found.volume;
+  if (!p.number && found.number) patch.number = found.number;
+  if (!p.pages && found.pages) patch.pages = found.pages;
+  if (!p.publisher && found.publisher) patch.publisher = found.publisher;
+  if (!p.type && found.type) patch.type = found.type;
   if (!p.doi && found.doi) patch.doi = found.doi;
   if (!p.url && found.url) patch.url = found.url;
   if (!p.abstract.trim() && found.abstract) patch.abstract = found.abstract;
@@ -56,10 +66,15 @@ export async function refetchMetadata(p: Paper): Promise<RefetchResult> {
   const mailto = useAppStore.getState().settings?.mailto;
   try {
     const base: RefEntry = {
+      type: p.type,
       title: p.title || undefined,
       authors: p.authors,
       year: p.year || undefined,
       venue: p.venue,
+      volume: p.volume,
+      number: p.number,
+      pages: p.pages,
+      publisher: p.publisher,
       doi: id.doi,
       arxivId: id.arxivId,
       url: p.url,
